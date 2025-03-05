@@ -44,7 +44,7 @@ This indicates that the process has finished, even if some URLs failed (those fa
 
 ## Requirements
 To run the Sitemap Checker, ensure your system meets these prerequisites:
-* PHP 7.4 or higher: The tool uses typed properties, introduced in PHP 7.4.
+* PHP 8.2 or higher
 * Composer: Required to install PHP dependencies.
 * Internet connection: Needed to download the sitemap and check the URLs.
 

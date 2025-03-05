@@ -66,7 +66,7 @@ class SitemapClient
             RequestOptions::TIMEOUT => 240,
         ]);
 
-        $contentType = $response->getHeader('Content-Type')[0];
+        $contentType = $response->getHeader('Content-Type')[0] ?? 'Nothing';
 
         if (! in_array($contentType, ['text/xml', 'application/xml'])) {
             throw new RuntimeException('Unexpected sitemap format. Expecting "application/xml" or "text/xml", got "' . $contentType . '"');
