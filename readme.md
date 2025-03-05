@@ -7,28 +7,27 @@ A command-line tool to validate URLs in an XML sitemap. This tool downloads an X
 To set up the Sitemap Checker on your system, follow these steps:
 
 1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/RomanNikolyuk/sitemap-checker.git
-   ```
+```bash
+git clone https://github.com/RomanNikolyuk/sitemap-checker.git
+```
 2. **Install dependencies using Composer:**
-   ```bash
-   composer install --no-dev
-   ```
-   This will download all required PHP dependencies, including Symfony Console and GuzzleHttp.
-
+```bash
+composer install --no-dev
+```
+This will download all required PHP dependencies, including Symfony Console and GuzzleHttp.
 
 ## Usage
 Run the tool from the command line by providing the URL of the sitemap you want to validate. The script must be executed with PHP and requires a sitemap URL as an argument.
 ### Command Syntax
 ```bash
-   php sitemap-checker.php <sitemap-url> <error-output.txt>
-   ```
+php index.php <sitemap-url> <error-output.txt>
+```
 
 ## Example
 To check a sitemap located at https://example.com/sitemap.xml, run:
 ```bash
-   php sitemap-checker.php https://example.com/sitemap.xml output.txt
-   ```
+php sitemap-checker.php https://example.com/sitemap.xml output.txt
+```
 **Note**: The sitemap URL is required. If you don’t provide a URL, the tool may fail with an error due to the way it’s implemented.
 
 ## Output
