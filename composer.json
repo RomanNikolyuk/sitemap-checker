@@ -1,0 +1,24 @@
+{
+    "name": "vlst/sitemap-checker",
+    "description": "Check all url addresses for broken links in some sitemap url",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9",
+        "symfony/console": "^7.2"
+    },
+    "license": "mit",
+    "autoload": {
+        "psr-4": {
+            "Vlst\\SitemapChecker\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Roman Nykoliuk",
+            "email": "roman.nikolyuk@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "maxbanton/dd": "^1.1"
+    }
+}
