@@ -4,6 +4,7 @@ namespace Vlst\SitemapChecker;
 
 use Closure;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
 use XMLReader;
@@ -14,7 +15,7 @@ class SitemapClient
 
     protected Closure $onError;
 
-    protected Closure $onFinished;
+    protected Closure $onInfo;
 
     public function setUrl(string $url): static
     {
@@ -30,15 +31,17 @@ class SitemapClient
         return $this;
     }
 
-    public function setOnFinished(callable $callback): static
+    public function setOnInfo(callable $callback): static
     {
-        $this->onFinished = $callback;
+        $this->onInfo = $callback;
 
         return $this;
     }
 
     public function check(): void
     {
+        ($this->onInfo)("Working on {$this->url}");
+
         $sitemapPath = $this->downloadSitemap();
 
         $this->parseSitemap($sitemapPath);
@@ -47,17 +50,20 @@ class SitemapClient
     public function downloadSitemap(): string
     {
         $tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR;
+        $path = $tmpDir . basename($this->url);
 
-        if (!is_dir($tmpDir)) {
-            if (!mkdir($tmpDir, 0777, true) && !is_dir($tmpDir)) {
-                throw new \RuntimeException("Failed to create directory: $tmpDir");
+        if (! is_dir($tmpDir)) {
+            if (! mkdir($tmpDir, 0777, true) && !is_dir($tmpDir)) {
+                throw new RuntimeException("Failed to create directory: $tmpDir");
             }
         }
 
         $client = new Client();
 
         $response = $client->get($this->url, [
-            RequestOptions::SINK => $tmpDir  . 'sitemap.xml',
+            RequestOptions::SINK => $path,
+            RequestOptions::CONNECT_TIMEOUT => 240,
+            RequestOptions::TIMEOUT => 240,
         ]);
 
         $contentType = $response->getHeader('Content-Type')[0];
@@ -66,7 +72,7 @@ class SitemapClient
             throw new RuntimeException('Unexpected sitemap format. Expecting "application/xml" or "text/xml", got "' . $contentType . '"');
         }
 
-        return $tmpDir  . 'sitemap.xml';
+        return $path;
     }
 
     protected function parseSitemap(string $sitemapPath): void
@@ -92,7 +98,11 @@ class SitemapClient
                     $link = $reader->readString();
 
                     if ($isSitemapIndex) {
+                        ($this->onInfo)('Working on child sitemap');
+
                         (clone $this)->setUrl($link)->check();
+
+                        ($this->onInfo)('Finished parsing child sitemap');
                     }
                 } elseif ($reader->name === 'xhtml:link') {
                     $link = $reader->getAttribute('href');
@@ -100,7 +110,16 @@ class SitemapClient
             }
 
             if ($link) {
-                $response = (new Client())->get($link);
+                try {
+                    $response = (new Client())->get($link, [
+                        RequestOptions::TIMEOUT => 20,
+                        RequestOptions::CONNECT_TIMEOUT => 20,
+                    ]);
+                } catch (GuzzleException $e) {
+                    ($this->onError)("Connect exception: {$link}", $e->getCode());
+
+                    continue;
+                }
 
                 if ($response->getStatusCode() !== 200) {
                     ($this->onError)($link, $response->getStatusCode());
@@ -108,6 +127,6 @@ class SitemapClient
             }
         }
 
-        ($this->onFinished)();
+        ($this->onInfo)('Done working on sitemap.');
     }
 }
