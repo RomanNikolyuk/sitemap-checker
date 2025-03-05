@@ -12,7 +12,7 @@ use Symfony\Component\Console\SingleCommandApplication;
 
 
 (new SingleCommandApplication())
-    ->addArgument('url', InputArgument::OPTIONAL, 'URL')
+    ->addArgument('url', InputArgument::REQUIRED, 'URL')
     ->addArgument('output', InputArgument::OPTIONAL, 'Where to output result file')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
         $client = new SitemapClient();
